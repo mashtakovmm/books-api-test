@@ -1,0 +1,25 @@
+services:
+  database:
+    image: postgres:alpine3.20
+    container_name: books-db
+    restart: always
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${DATABASE_ROOT}
+      - POSTGRES_PASSWORD=${DATABASE_PASS}
+      - POSTGRES_DB=${DATABASE_NAME}
+    volumes:
+      - books-db-data:/data/db
+    # networks:
+    #   - backend
+
+
+volumes:
+  books-db-data:
+
+    # networks:
+    #   backend:
+    # frontend:
