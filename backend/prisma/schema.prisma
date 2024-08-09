@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Book {
-    id              Int      @id @default(autoincrement())
+    id              String   @id @default(uuid())
     title           String
     author          String
     publicationDate DateTime
@@ -22,7 +22,7 @@ model Book {
 }
 
 model User {
-    id       Int    @id @default(autoincrement())
+    id       String @id @default(uuid())
     username String
     password String
     email    String
