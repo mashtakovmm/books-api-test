@@ -4,7 +4,7 @@ import {
     postLoginUser,
     postRegisterUser,
     putChangeUserRole,
-    putVerifyUserEmail
+    getVerifyUserEmail
 } from "../controllers/users";
 import { userValidateBody, userValidateResult } from "../middleware/validator";
 import verifyToken from "../middleware/verify-token";
@@ -15,6 +15,6 @@ router.route('/register').post(userValidateBody, userValidateResult, postRegiste
 router.route('/login').post(postLoginUser)
 router.route('/me').get(verifyToken, getUserInfo)
 router.route('/:id/role').put(verifyToken, putChangeUserRole)
-router.route('/verify/:token').put(putVerifyUserEmail)
+router.route('/verify/:token').get(getVerifyUserEmail)
 
 export default router

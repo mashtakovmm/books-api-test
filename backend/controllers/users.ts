@@ -63,7 +63,7 @@ export const postRegisterUser = asyncWrapper(async (req: Request, res: Response)
     res.status(201).json(userWithToken)
 })
 
-export const putVerifyUserEmail = asyncWrapper(async (req: Request, res: Response) => {
+export const getVerifyUserEmail = asyncWrapper(async (req: Request, res: Response) => {
     const user = await prisma.user.findFirst({
         where: {
             EmailToken: {
@@ -85,7 +85,7 @@ export const putVerifyUserEmail = asyncWrapper(async (req: Request, res: Respons
         }
     })
 
-    res.status(201).json(updatedUser)
+    res.status(201).send('<p>Done!</p>')
 })
 
 export const getUserInfo = asyncWrapper(async (req: Request, res: Response) => {
