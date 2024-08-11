@@ -1,5 +1,4 @@
 # Use this file as .env example
 
-DATABASE_URL = "postgresql://{yourDBroot}:{yourDBpass}@localhost:5432/{yourDBname}?schema=public"
-
-JWT_SECRET = yourValueHere
+DATABASE_URL="postgresql://booksDBadmin:coolAdminPass@books-db/booksDB?schema=public" # For DB access
+JWT_SECRET=yourValueHere # For JWT token generation
