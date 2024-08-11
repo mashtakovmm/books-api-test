@@ -3,6 +3,7 @@ import asyncWrapper from '../middleware/async-wrapper';
 import { PrismaClient } from '@prisma/client';
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from '../secrets/secrets';
+import { ROLE_FLAGS } from '../utils/roles';
 
 const prisma = new PrismaClient();
 
@@ -49,7 +50,26 @@ export const putChangeUserRole = asyncWrapper(async (req: Request, res: Response
     const roleIdNumber = parseInt(req.body.roleId, 10);
     const totalRoles = await prisma.role.count();
 
-    if ( !roleIdNumber || roleIdNumber > totalRoles) {
+    const authUserID = req.userID?.id
+    const authUserData = await prisma.user.findFirst({
+        where: {
+            id: authUserID
+        },
+        select: {
+            Role: true
+        }
+    })
+
+    // exclude 0 as 0 is a possible value for permissions
+    if (!authUserData?.Role?.permissions && authUserData?.Role?.permissions !== 0 ) {
+        return res.status(404).json({ error: "Ivalid token\\User not found" })
+    }
+
+    if ((authUserData?.Role?.permissions & ROLE_FLAGS.GRANT_ROLE) !== ROLE_FLAGS.GRANT_ROLE) {
+        return res.status(403).json({error: "You do not have the permision"})
+    }
+
+    if (!roleIdNumber || roleIdNumber > totalRoles) {
         return res.status(400).json({ error: "Invalid Role ID" });
     }
 

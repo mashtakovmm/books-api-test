@@ -6,10 +6,11 @@ import {
     putUpdateBookByID,
     deleteBookByID
 } from "../controllers/books";
+import verifyToken from "../middleware/verify-token";
 
 const router = Router();
 
-router.route('/').get(getAllBooks).post(postCreateNewBook)
-router.route('/:id').get(getBookById).put(putUpdateBookByID).delete(deleteBookByID)
+router.route('/').get(getAllBooks).post(verifyToken, postCreateNewBook)
+router.route('/:id').get(getBookById).put(verifyToken, putUpdateBookByID).delete(verifyToken, deleteBookByID)
 
 export default router
