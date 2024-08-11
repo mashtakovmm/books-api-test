@@ -23,8 +23,17 @@ model Book {
 
 model User {
     id       String @id @default(uuid())
-    username String
+    username String @unique
     password String
-    email    String
-    bitmasks Int[]
+    email    String @unique
+
+    Role   Role?   @relation(fields: [roleId], references: [id])
+    roleId String?
+}
+
+model Role {
+    id          String @id @default(uuid())
+    name        String @unique
+    permissions Int
+    user        User[]
 }

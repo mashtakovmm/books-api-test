@@ -1,7 +1,7 @@
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 
 const asyncWrapper = (fn: Function) => {
-    return async (req: Request, res: Response, next: Function) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
         try {
             await fn(req, res, next)
         }

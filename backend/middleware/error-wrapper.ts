@@ -1,7 +1,6 @@
-import { PrismaClientInitializationError, PrismaClientKnownRequestError, PrismaClientRustPanicError, PrismaClientUnknownRequestError, PrismaClientValidationError } from "@prisma/client/runtime/library"
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 
-const errorWrapper = (err: Error, req: Request, res: Response, next: Function) => {
+const errorWrapper = (err: Error, req: Request, res: Response, next: NextFunction) => {
     return res.status(502).json({ error: err })
 }
 
