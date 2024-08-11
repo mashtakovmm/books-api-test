@@ -25,6 +25,12 @@ services:
       - mailhog
     networks:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U booksDBadmin -d booksDB"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   backend:
     container_name: books-backend
@@ -32,14 +38,14 @@ services:
     build: 
       context: ./backend
       dockerfile: dockerfile
-      args: 
-        DB_URL: postgresql://booksDBadmin:coolAdminPass@books-db/booksDB?schema=public
-        SECRET: 213432432
+    env_file:
+      - ./backend/.env
     ports:
       - 8000:8000
 
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     networks:
       - backend
 
