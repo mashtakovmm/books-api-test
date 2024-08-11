@@ -5,21 +5,21 @@ services:
     restart: always
     ports:
       - 5432:5432
-    # env_file:
-    #   - .env
     environment:
       - POSTGRES_USER=booksDBadmin
       - POSTGRES_PASSWORD=coolAdminPass
       - POSTGRES_DB=booksDB
     volumes:
       - books-db-data:/data/db
-    # networks:
-    #   - backend
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: mailhog
+    restart: always
+    ports:
+      - 8025:8025
+      - 1025:1025
 
 
 volumes:
   books-db-data:
-
-    # networks:
-    #   backend:
-    # frontend:

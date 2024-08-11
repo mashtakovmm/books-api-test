@@ -4,6 +4,8 @@ import { PrismaClient } from '@prisma/client';
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from '../secrets/secrets';
 import { ROLE_FLAGS } from '../utils/roles';
+import { Email } from '../utils/email';
+import { randomBytes } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -26,6 +28,7 @@ export const postLoginUser = asyncWrapper(async (req: Request, res: Response) =>
 })
 
 export const postRegisterUser = asyncWrapper(async (req: Request, res: Response) => {
+
     const newUser = await prisma.user.create({
         data: {
             email: req.body.email,
@@ -33,7 +36,56 @@ export const postRegisterUser = asyncWrapper(async (req: Request, res: Response)
             username: req.body.username,
         }
     })
-    res.status(201).json(newUser)
+
+    const token = randomBytes(128).toString('hex')
+    const emailToken = await prisma.emailToken.create({
+        data: {
+            token: token
+        }
+    })
+
+    const userWithToken = await prisma.user.update({
+        where: {
+            id: newUser.id
+        },
+        data: {
+            EmailToken: {
+                connect: {
+                    id: emailToken.id
+                }
+            }
+        }
+    })
+
+    const email = new Email(userWithToken.email, emailToken.token)
+    email.sendMail();
+
+    res.status(201).json(userWithToken)
+})
+
+export const putVerifyUserEmail = asyncWrapper(async (req: Request, res: Response) => {
+    const user = await prisma.user.findFirst({
+        where: {
+            EmailToken: {
+                token: req.params.token
+            }
+        }
+    })
+
+    if (!user) {
+        return res.status(400).send("no user")
+    }
+
+    const updatedUser = await prisma.user.update({
+        where: {
+            id: user?.id
+        },
+        data: {
+            roleId: 2
+        }
+    })
+
+    res.status(201).json(updatedUser)
 })
 
 export const getUserInfo = asyncWrapper(async (req: Request, res: Response) => {
@@ -61,12 +113,12 @@ export const putChangeUserRole = asyncWrapper(async (req: Request, res: Response
     })
 
     // exclude 0 as 0 is a possible value for permissions
-    if (!authUserData?.Role?.permissions && authUserData?.Role?.permissions !== 0 ) {
+    if (!authUserData?.Role?.permissions && authUserData?.Role?.permissions !== 0) {
         return res.status(404).json({ error: "Ivalid token\\User not found" })
     }
 
     if ((authUserData?.Role?.permissions & ROLE_FLAGS.GRANT_ROLE) !== ROLE_FLAGS.GRANT_ROLE) {
-        return res.status(403).json({error: "You do not have the permision"})
+        return res.status(403).json({ error: "You do not have the permision" })
     }
 
     if (!roleIdNumber || roleIdNumber > totalRoles) {
