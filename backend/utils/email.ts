@@ -6,6 +6,7 @@ export class Email {
 
     constructor(to: string, token: string) {
         this.transporter = nodemailer.createTransport({
+            host: 'mailhog',
             port: 1025,
         });
 

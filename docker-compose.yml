@@ -1,4 +1,14 @@
 services:
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: mailhog
+    restart: always
+    ports:
+      - 8025:8025
+      - 1025:1025
+    networks:
+      - backend
+
   database:
     image: postgres:alpine3.20
     container_name: books-db
@@ -11,15 +21,30 @@ services:
       - POSTGRES_DB=booksDB
     volumes:
       - books-db-data:/data/db
+    depends_on:
+      - mailhog
+    networks:
+      - backend
 
-  mailhog:
-    image: mailhog/mailhog:v1.0.1
-    container_name: mailhog
+  backend:
+    container_name: books-backend
     restart: always
+    build: 
+      context: ./backend
+      dockerfile: dockerfile
+      args: 
+        DB_URL: postgresql://booksDBadmin:coolAdminPass@books-db/booksDB?schema=public
+        SECRET: 213432432
     ports:
-      - 8025:8025
-      - 1025:1025
+      - 8000:8000
 
+    depends_on:
+      - database
+    networks:
+      - backend
 
 volumes:
   books-db-data:
+
+networks:
+  backend:
