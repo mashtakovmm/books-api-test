@@ -27,12 +27,12 @@ model User {
     password String
     email    String @unique
 
-    Role   Role?   @relation(fields: [roleId], references: [id])
-    roleId String?
+    Role   Role? @relation(fields: [roleId], references: [id])
+    roleId Int?  @default(1)
 }
 
 model Role {
-    id          String @id @default(uuid())
+    id          Int    @id @default(autoincrement())
     name        String @unique
     permissions Int
     user        User[]

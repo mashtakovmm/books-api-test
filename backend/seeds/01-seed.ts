@@ -19,6 +19,7 @@ async function main() {
             }
         ],
     });
+    console.log("Role seeding done")
 }
 
 main()

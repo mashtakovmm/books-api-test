@@ -3,7 +3,6 @@ import asyncWrapper from '../middleware/async-wrapper';
 import { PrismaClient } from '@prisma/client';
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from '../secrets/secrets';
-import { ROLE_FLAGS } from '../utils/roles';
 
 const prisma = new PrismaClient();
 
@@ -30,7 +29,7 @@ export const postRegisterUser = asyncWrapper(async (req: Request, res: Response)
         data: {
             email: req.body.email,
             password: req.body.password,
-            username: req.body.username
+            username: req.body.username,
         }
     })
     res.status(201).json(newUser)
@@ -46,27 +45,21 @@ export const getUserInfo = asyncWrapper(async (req: Request, res: Response) => {
     res.status(201).json(userInfo)
 })
 
-// export const putChangeUserRole = asyncWrapper(async (req: Request, res: Response) => {
-//     const userID = req.params.id
-//     const user = await prisma.user.findFirst({
-//         where: {
-//             id: userID
-//         },
-//         select: {
-//             roleFlag: true
-//         }
-//     })
-//     if (!user) {
-//         return res.status(404).json({ error: "User not found" })
-//     }
-//     const newRoleFlag = user.roleFlag | req.body.role
-//     const newUserInfo = await prisma.user.update({
-//         where: {
-//             id: userID
-//         },
-//         data: {
-//             roleFlag: newRoleFlag
-//         }
-//     })
-//     res.status(201).json(newUserInfo)
-// })
+export const putChangeUserRole = asyncWrapper(async (req: Request, res: Response) => {
+    const roleIdNumber = parseInt(req.body.roleId, 10);
+    const totalRoles = await prisma.role.count();
+
+    if ( !roleIdNumber || roleIdNumber > totalRoles) {
+        return res.status(400).json({ error: "Invalid Role ID" });
+    }
+
+    const newUserInfo = await prisma.user.update({
+        where: {
+            id: req.params.id
+        },
+        data: {
+            roleId: roleIdNumber
+        }
+    })
+    res.status(201).json(newUserInfo)
+})
