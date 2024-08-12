@@ -49,6 +49,13 @@ To set up the project locally, follow these steps:
 
 The database is populated with predefined roles and users upon startup. To modify this data, update the scripts `01-seed.ts`, `02-seed.ts`, and `03-seed.ts` located in the `./backend/seeds` folder.
 
+### Default Roles
+
+By default the database is seeded with following roles:
+- **Unverified user (id: 1)**: given on user register by default.
+- **User (id: 2)**: given on email confirmation.
+- **Admin (id: 3)**: can be given through API.
+
 ## Used libraries and software
 - **Express**
 - **Prisma**
